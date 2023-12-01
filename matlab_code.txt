@@ -1,0 +1,81 @@
+clear all;
+close all;
+
+t=0:0.01:1;
+fs = 1000;
+n = 0:1/fs:1-1/fs;
+A=[0.15,1,0.09,0.2,0.15,0.12,0.1,0.08];
+F=[20,50.2,17,150,250,350,550,650];
+Z=[0,0,0,30,135,60,0,45]; 
+sum=0;
+for i=1:8
+    x=A(i)*sin(2*pi*F(i)*t-Z(i));
+    y=hilbert(x);%input 
+    inamp=sqrt(x.*x+y.*y);%instaneous amplitude 
+    l= atand(y/x);
+    freq= diff(l)/(2*pi);
+    p=inrms(inamp,y);
+end
+subplot(3,1,1);
+plot(t,x);
+subplot(3,1,2);
+stem(n,p);
+[4/2, 11:16 AM] Lokesh G: function f=inrms(inst_amp,z)
+hil=z;%%hilbert transform
+window_length = 100;
+f = zeros(1,length(hil));
+for i = 1:length(hil)-window_length+1
+    f(i+window_length-1) = sqrt(mean(inst_amp(i:i+window_length-1).^2));
+end
+
+clc;
+clear all;
+close all;
+t=0:0.01:1;
+A=[0.15,1,0.09,0.2,0.15,0.12,0.1,0.08];
+F=[20,50.2,17,150,250,350,550,650];
+Z=[0,0,0,30,135,60,0,45];
+x=0;
+sum=0;
+h=0;
+g=0;
+k=0;
+j=0;
+for i=1:8
+    x=x+(A(i).*cos(2*pi.*F(i).*t-Z(i)));
+    y=hilbert(x);
+    inamp=sqrt(x.*x+y.*y);%instaneous amplitude\
+    sum=sum+inamp;
+    l=atan(y./x);
+    inf=diff(l)*0.5*0.31847;
+    h=h+inamp.*inamp;
+    ifa=inamp;
+    g=g+(inf(i).*inamp.*inamp);
+    c=pow2(inf);
+    j=j+c(i).*h;
+end;
+xrms=sqrt(0.5.*h);
+subplot(9,1,1);
+plot(t,x);
+subplot(9,1,2);
+stem(xrms);
+subplot(9,1,3);
+stem(ifa);
+ifv=g./h;
+subplot(9,1,4);
+stem(ifv);
+for i=2:8
+    k=k+inamp(i).*inamp(i);
+end
+ithd=sqrt(k)/inamp(1);
+subplot(9,1,5);
+stem(ithd);
+indei=sqrt(k./h);
+subplot(9,1,6);
+stem(indei);
+ikf=(j./h)*0.0004;
+subplot(9,1,7);
+stem(ikf);
+iff=(xrms./sum)*0.6366197;
+subplot(9,1,8);
+stem(iff);
